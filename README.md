@@ -1,5 +1,6 @@
 # Serverless solution for monitoring websites and SSL Certs
 
+![screenshot](https://github.com/vbarba/serverless-site-and-ssl-monitoring/blob/main/screenshot.png?raw=true)
 
 ## Intro
 The key components are:
