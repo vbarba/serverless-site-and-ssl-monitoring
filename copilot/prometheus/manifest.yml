@@ -1,0 +1,8 @@
+name: prometheus
+type: Backend Service
+image:
+  build: prometheus/Dockerfile
+  port: 9090
+cpu: 256
+memory: 512
+count: 1

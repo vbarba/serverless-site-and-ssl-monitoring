@@ -1,0 +1,67 @@
+# Transform: AWS::SecretsManager-2020-07-23
+Parameters:
+  App:
+    Type: String
+    Description: Your application's name.
+  Env:
+    Type: String
+    Description: The environment name your service, job, or workflow is being deployed to.
+  Name:
+    Type: String
+    Description: The name of the service, job, or workflow being deployed.
+Resources:
+  RDSCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      MasterUsername: !Ref Name
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${MyRDSInstanceSecret}}}'
+      Engine: aurora-mysql
+      BackupRetentionPeriod: 7
+      EngineMode: serverless
+      DatabaseName: !Ref Name
+      DBSubnetGroupName:
+            Ref: MyDBSubnetGroup
+      VpcSecurityGroupIds:
+        - Fn::ImportValue:
+            !Sub "${App}-${Env}-EnvironmentSecurityGroup"       
+      ScalingConfiguration:
+        AutoPause: true
+        MinCapacity: 1
+        MaxCapacity: 2
+        SecondsUntilAutoPause: 1000
+  MyDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: "Api Database Subnet Group"
+      SubnetIds:
+        Fn::Split:
+          - ","
+          -  Fn::ImportValue:
+              !Sub "${App}-${Env}-PrivateSubnets" 
+  MyRDSInstanceSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'This is my rds cluster secret'
+      GenerateSecretString:
+        PasswordLength: 16
+        ExcludePunctuation: true
+
+  GrafanaAdminPassword:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '${App}-${Env}-${Name}-AdminPassword'
+      Description: 'This is my grafana admin secret'
+      GenerateSecretString:
+        PasswordLength: 16
+        ExcludePunctuation: true
+
+Outputs:
+  GfSecurityAdminPassword:
+    Description: "Database endpoint"
+    Value: !Ref GrafanaAdminPassword
+  GfDatabaseHost:
+    Description: "Database endpoint"
+    Value: !GetAtt RDSCluster.Endpoint.Address
+  GfDatabasePassword:
+    Description: "Database secret password"
+    Value: !Ref "MyRDSInstanceSecret"

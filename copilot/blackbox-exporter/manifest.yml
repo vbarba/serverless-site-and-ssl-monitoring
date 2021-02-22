@@ -1,0 +1,9 @@
+name: blackbox-exporter
+type: Backend Service
+
+image:
+  build: blackbox-exporter/Dockerfile
+  port: 9115
+cpu: 256
+memory: 512
+count: 1

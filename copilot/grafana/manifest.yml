@@ -1,0 +1,20 @@
+name: grafana
+type: Load Balanced Web Service
+
+image:
+  build: grafana/Dockerfile
+  port: 3000
+
+http:
+  path: '/'
+  healthcheck: '/api/health'
+
+cpu: 256
+memory: 512
+count: 1
+
+variables:
+  GF_USERS_ALLOW_SIGN_UP: false
+  GF_DATABASE_TYPE: mysql
+  GF_DATABASE_NAME: grafana
+  GF_DATABASE_USER: grafana

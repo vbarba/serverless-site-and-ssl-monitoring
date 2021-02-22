@@ -1,0 +1,1 @@
+FROM prom/blackbox-exporter:master

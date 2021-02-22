@@ -1,0 +1,17 @@
+version: "2"
+services:
+  prometheus.monitoring.local:
+    build: prometheus/.
+    ports:
+      - "9090:9090"
+  blackbox-exporter.monitoring.local:
+    build: blackbox-exporter/.
+    ports:
+      - 9115:9115
+  grafana:
+    build: grafana/.
+    user: "472"
+    depends_on:
+      - prometheus.monitoring.local
+    ports:
+      - 3000:3000
